@@ -276,10 +276,14 @@ func deleteEvent(eventId string, cookies []*http.Cookie) {
 }
 
 func nextEventId(html string) string {
-	eventId := html[strings.Index(html, CURRENT_EVENT_ID_POSITION):]
+	index := strings.Index(html, CURRENT_EVENT_ID_POSITION)
+	if index < 0 {
+		return ""
+	}
+	eventId := html[index:]
 	eventId = eventId[strings.Index(eventId, EVENT_ID_START)+len(EVENT_ID_START):]
 	eventId = eventId[strings.Index(eventId, EVENT_ID_START)+len(EVENT_ID_START):]
-	index := strings.Index(eventId, EVENT_ID_START)
+	index = strings.Index(eventId, EVENT_ID_START)
 	if index < 0 {
 		return ""
 	}
