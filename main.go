@@ -27,6 +27,7 @@ const (
 	TYPE_TIP                  = 3
 	TYPE_GOODS                = 4
 	TYPE_COMPANY              = 5
+	TYPE_ANNOUNCE_METHOD      = 6
 	CURRENT_EVENT_ID_POSITION = "F9F5C6"
 	TITLE_START               = "<!--EAP_SUBJECT-->"
 	TITLE_END                 = "<!--/EAP_SUBJECT-->"
@@ -35,6 +36,8 @@ const (
 	TIP_END                   = "</td>"
 	GOODS_START               = "3px 5px 0px 5px; word-break: break-all\">"
 	GOODS_END                 = "</td>"
+	ANNOUNCE_METHOD_START     = "style=\"padding:3px 0px 0px 5px;line-height:1.7;\" align=\"left\" bgcolor=\"#FFFFFF\">"
+	ANNOUNCE_METHOD_END       = "</td>"
 )
 
 type FilterEntry struct {
@@ -147,6 +150,7 @@ func main() {
 		tipFind := false
 		filtered := false
 		company := ""
+		announceMethod := ""
 		var goods []string
 		for _, entry := range filter {
 			switch entry.typeValue {
@@ -231,6 +235,21 @@ func main() {
 					return
 				}
 				if regex.MatchString(company) {
+					deleteEvent(eventId, cookies)
+					filtered = true
+				}
+			// 발표방법
+			case TYPE_ANNOUNCE_METHOD:
+				if len(announceMethod) == 0 {
+					announceMethod = html[strings.Index(html, ANNOUNCE_METHOD_START)+len(ANNOUNCE_METHOD_START):]
+					announceMethod = strings.TrimSpace(announceMethod[:strings.Index(announceMethod, ANNOUNCE_METHOD_END)])
+				}
+				regex, error := regexp.Compile(entry.regex)
+				if error != nil {
+					fmt.Println("[필터 파일 오류]정규표현식을 해석하지 못했습니다. 해당 표현식 : " + entry.regex)
+					return
+				}
+				if regex.MatchString(announceMethod) {
 					deleteEvent(eventId, cookies)
 					filtered = true
 				}
